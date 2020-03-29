@@ -11,9 +11,9 @@ class Matrix
     public:
         class Row
         {
-            public:
                 int* a;
                 int columns;
+            public:
                 Row(const size_t col);
                 Row(const size_t col, int* val);
                 ~Row();
