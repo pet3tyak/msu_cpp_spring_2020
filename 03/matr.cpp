@@ -1,30 +1,43 @@
 #include "matrix.h"
 
-Row::Row(const int col)
+Matrix::Row::Row(const size_t col)
 {
     columns = col;
-    a = new int[columns];
-    for(int i=0;i<columns;i++)
-    a[i]=0;
+    a = nullptr;//new int[columns];
+    //for(int i=0;i<columns;i++)
+    //a[i]=0;
+    //std::cout<<"createrow"<<std::endl;
 }
-Row::~Row()
+Matrix::Row::Row(const size_t col, int* val)
+{
+    columns = col;
+    a = val;//new int[columns];
+    //for(int i=0;i<columns;i++)
+    //a[i]=0;
+    //std::cout<<"createrow"<<std::endl;
+}
+Matrix::Row::~Row()
 {
     //std::cout<<"destructbeg"<<std::endl;
     columns=0;
+    //std::cout<<"destructrow"<<std::endl;
     //std::cout<<"destructend"<<std::endl;
 }
-int& Row::operator[](int ncolumn) const
+const int& Matrix::Row::operator[](int ncolumn) const
 {
     if (ncolumn>columns)
         throw std::out_of_range("What a shame");
     return a[ncolumn];
 }
-void Row::operator*=(int k)
+
+int& Matrix::Row::operator[](int ncolumn)
 {
-    for (int i=0;i<columns;i++)
-    a[i]*=k;
+    if (ncolumn>columns)
+        throw std::out_of_range("What a shame");
+    return a[ncolumn];
 }
-bool Row::operator==(const Row rot)
+
+bool Matrix::Row::operator==(const Row rot) const
 {
     for (int i=0;i<columns;i++)
     {
@@ -33,18 +46,19 @@ bool Row::operator==(const Row rot)
     }
     return true;
 }
-bool Row::operator!=(const Row rot)
+bool Matrix::Row::operator!=(const Row rot) const
 {
     return !(*this==rot);
 }
 
-Matrix::Matrix(int ra,int col)
+Matrix::Matrix(const size_t ra,const size_t col)
 {
     rows=ra;
     columns=col;
     raw = new int[rows*columns];
     for(int i=0;i<rows*columns;i++)
     raw[i]=0;
+    //std::cout<<"createmat"<<std::endl;
 }
 Matrix::~Matrix()
 {
@@ -52,21 +66,30 @@ Matrix::~Matrix()
     delete[] raw;
     rows=0;
     columns=0;
+    //std::cout<<"deletemat"<<std::endl;
     //std::cout<<"destructmatend"<<std::endl;
 }
-Row Matrix::operator[](int nrow) const
+const Matrix::Row Matrix::operator[](int nrow) const
 {
-    Row strok(columns);
     if (nrow>=rows)
         throw std::out_of_range("What a shame");
-    for (int i=0;i<columns;i++)
-        strok.a=raw+nrow*columns;
+    const Matrix::Row strok(columns,raw+nrow*columns);
     return strok;
 }
-void Matrix::operator*=(int k)
+
+Matrix::Row Matrix::operator[](int nrow)
+{
+    if (nrow>=rows)
+        throw std::out_of_range("What a shame");
+    Matrix::Row strok(columns,raw+nrow*columns);
+    return strok;
+}
+
+Matrix* Matrix::operator*=(int k)
 {
     for (int i=0;i<rows*columns;i++)
         raw[i]*=k;
+    return this;
 }
 int Matrix::getrows() const
 {
@@ -76,7 +99,7 @@ int Matrix::getcolumns() const
 {
     return columns;
 }
-bool Matrix::operator==(const Matrix& Mat)
+bool Matrix::operator==(const Matrix& Mat) const
 {
     if (this == &Mat)
         return true;
@@ -89,7 +112,7 @@ bool Matrix::operator==(const Matrix& Mat)
     }
     return true;
 }
-bool Matrix::operator!=(const Matrix& Mat)
+bool Matrix::operator!=(const Matrix& Mat) const
 {
     return !(*this==Mat);
 }

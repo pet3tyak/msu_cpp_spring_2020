@@ -55,11 +55,12 @@ void test2() {
     m1 *= 3;
     assert(m1 != m2);
     assert(m1[2][2] == 12);
-    std::cout<<1<<std::endl;
 }
 
 int main() {
     test1();
     test2();
+    //const Matrix m(4,5);
+    //m[1][1]=1;
     return 0;
 }
