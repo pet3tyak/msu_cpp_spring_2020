@@ -17,13 +17,13 @@ public:
         Row(const size_t col);
         Row(const size_t col, int* val);
         ~Row();
-        const int& operator[](int ncolumn) const;
-        int& operator[](int ncolumn);
+        const int& operator[](size_t ncolumn) const;
+        int& operator[](size_t ncolumn);
     };
     Matrix(const size_t ra,const size_t col);
     ~Matrix();
-    const Row operator[](int nrow) const;
-    Row operator[](int nrow);
+    const Row operator[](size_t nrow) const;
+    Row operator[](size_t nrow);
     Matrix& operator*=(int k);
     int getrows() const;
     int getcolumns() const;

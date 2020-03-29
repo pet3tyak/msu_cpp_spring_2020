@@ -14,14 +14,14 @@ Matrix::Row::~Row()
 {
     columns=0;
 }
-const int& Matrix::Row::operator[](int ncolumn) const
+const int& Matrix::Row::operator[](size_t ncolumn) const
 {
     if (ncolumn>columns)
         throw std::out_of_range("What a shame");
     return a[ncolumn];
 }
 
-int& Matrix::Row::operator[](int ncolumn)
+int& Matrix::Row::operator[](size_t ncolumn)
 {
     if (ncolumn>columns)
         throw std::out_of_range("What a shame");
@@ -42,7 +42,7 @@ Matrix::~Matrix()
     rows=0;
     columns=0;
 }
-const Matrix::Row Matrix::operator[](int nrow) const
+const Matrix::Row Matrix::operator[](size_t nrow) const
 {
     if (nrow>=rows)
         throw std::out_of_range("What a shame");
@@ -50,7 +50,7 @@ const Matrix::Row Matrix::operator[](int nrow) const
     return strok;
 }
 
-Matrix::Row Matrix::operator[](int nrow)
+Matrix::Row Matrix::operator[](size_t nrow)
 {
     if (nrow>=rows)
         throw std::out_of_range("What a shame");
