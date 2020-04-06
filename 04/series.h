@@ -23,18 +23,18 @@ class Serializer
     std::ostream& out_;
 public:
     explicit Serializer(std::ostream& out)
-        : out_(out)
+    : out_(out)
     {
     }
-
+    
     template <class T>
     Error save(T& object)
     {
         return object.serialize(*this);
     }
-
+    
     template <class... ArgsT>
-    Error operator()(ArgsT... args)
+    Error operator()(ArgsT&... args)
     {
         return process(args...);
     }
@@ -69,7 +69,7 @@ class Deserializer
     std::istream& in_;
 public:
     explicit Deserializer(std::istream& in)
-        : in_(in)
+    : in_(in)
     {
     }
     template <class T>
@@ -77,7 +77,7 @@ public:
     {
         return object.deserialize(*this);
     }
-
+    
     template <class... ArgsT>
     Error operator()(ArgsT&... args)
     {
@@ -100,26 +100,24 @@ private:
     {
         std::string text;
         in_ >> text;
-    if (text == "true")
-    {
-        val = true;
-    }
-    else if (text == "false")
-        val = false;
-    else
-        return Error::CorruptedArchive;
-
-    return Error::NoError;
+        if (text == "true")
+        {
+            val = true;
+        }
+        else if (text == "false")
+            val = false;
+        else
+            return Error::CorruptedArchive;
+        
+        return Error::NoError;
     }
     Error process (uint64_t& val)
     {
         std::string text;
         in_ >> text;
-        std::stringstream stream;
         if (is_number(text))
         {
-            stream<<text;
-            stream>>val;
+            val=std::stoi(text);
         }
         else
             return Error::CorruptedArchive;
