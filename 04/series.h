@@ -10,13 +10,6 @@ enum class Error
     CorruptedArchive
 };
 
-bool is_number(const std::string& s)
-{
-    std::string::const_iterator it = s.begin();
-    while (it != s.end() && std::isdigit(*it)) ++it;
-    return !s.empty() && it == s.end();
-}
-
 class Serializer
 {
     static constexpr char Separator = ' ';
@@ -115,7 +108,11 @@ private:
     {
         std::string text;
         in_ >> text;
-        if (is_number(text))
+        std::string::const_iterator it = text.begin();
+        while (it != text.end() && std::isdigit(*it))
+            ++it;
+        bool k = !text.empty() && it == text.end();
+        if (k)
         {
             val=std::stoi(text);
         }
