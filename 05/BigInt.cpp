@@ -1,5 +1,5 @@
 #include "BInt.h"
-
+#define MAX_CELL 1000000000
 BigInt::BigInt()
 {
     size=1;
@@ -13,12 +13,12 @@ BigInt::BigInt(int val)
     this->sign=(val>=0);
     if (!this->sign)
         val*=-1;
-    if (int x=val/1000000000)
+    if (int x=val/MAX_CELL)
     {
         this->size++;
         this->head=(int*)malloc(2*sizeof(int));
         this->head[1]=x;
-        this->head[0]=val%1000000000;
+        this->head[0]=val%MAX_CELL;
     }
     else
     {
@@ -51,31 +51,20 @@ BigInt::~BigInt()
 
 BigInt& BigInt::operator=(int val)
 {
-    free(this->head);
     this->size=1;
     this->sign=(val>=0);
     if (!this->sign)
         val*=-1;
-    if (int x=val/1000000000)
+    if (int x=val/MAX_CELL)
     {
         this->size++;
-        this->head=(int*)malloc(2*sizeof(int));
-        if (!this->head)
-        {
-            std::cout<<"Cannot allocate memory"<<std::endl;
-            return *this;
-        }
+        this->ChangeMem(this->size,true);
         this->head[1]=x;
-        this->head[0]=val%1000000000;
+        this->head[0]=val%MAX_CELL;
     }
     else
     {
-        this->head=(int*)malloc(sizeof(int));
-        if (!this->head)
-        {
-            std::cout<<"Cannot allocate memory"<<std::endl;
-            return *this;
-        }
+        this->ChangeMem(this->size,true);
         this->head[0]=val;
     }
     return *this;
@@ -83,16 +72,9 @@ BigInt& BigInt::operator=(int val)
 
 BigInt& BigInt::operator=(const BigInt& val)
 {
-    if (this->head)
-        free(this->head);
     this->size=val.size;
     this->sign=val.sign;
-    this->head=(int*)malloc(this->size*sizeof(int));
-    if (!this->head)
-        {
-            std::cout<<"Cannot allocate memory"<<std::endl;
-            return *this;
-        }
+    this->ChangeMem(this->size,true);
     for (int i=0; i<this->size;i++)
     {
         this->head[i]=val.head[i];
@@ -129,7 +111,7 @@ std::ostream& operator<<(std::ostream &cc, const BigInt& val)
     i++;
     for (;i<val.size;i++)
     {
-        int m=100000000;
+        int m=MAX_CELL/10;
         for (j=0;j<9;j++)
         {
             cc<<k[val.size-i-1]/m%10;
@@ -139,7 +121,7 @@ std::ostream& operator<<(std::ostream &cc, const BigInt& val)
     return cc;
 }
 
-const BigInt BigInt::operator-() const
+BigInt BigInt::operator-() const
 {
     BigInt c=*this;
     if (c.sign)
@@ -234,14 +216,14 @@ bool BigInt::operator>=(const int val) const
     return *this>=BigInt(val);
 }
 
-const BigInt BigInt::abs() const
+BigInt BigInt::abs() const
 {
     BigInt l=*this;
     l.sign=true;
     return l;
 }
 
-const BigInt BigInt::operator+(const BigInt &b) const
+BigInt BigInt::operator+(const BigInt &b) const
 {
     if (b.size>this->size)
         return b+*this;
@@ -251,21 +233,16 @@ const BigInt BigInt::operator+(const BigInt &b) const
         for (int i=0;i<c.size;i++)
         {
             c.head[i]+=b.head[i];
-            if (c.head[i]/1000000000)
+            if (c.head[i]/MAX_CELL)
             {
                 if (i==c.size-1)
                 {
                     c.size+=1;
-                    c.head=(int*)realloc(c.head,c.size*sizeof(int));
-                    if (!c.head)
-                        {
-                            std::cout<<"Cannot allocate memory"<<std::endl;
-                            return *this;
-                        }
+                    c.ChangeMem(c.size,false);
                     c.head[c.size-1]=0;
                 }
-                c.head[i+1]+=c.head[i]%1000000000;
-                c.head[i]=c.head[i]/1000000000;
+                c.head[i+1]+=c.head[i]%MAX_CELL;
+                c.head[i]=c.head[i]/MAX_CELL;
             }
         }
     }
@@ -279,7 +256,7 @@ const BigInt BigInt::operator+(const BigInt &b) const
                 if (c.head[i]<0)
                 {
                     c.head[i+1]--;
-                    c.head[i]+=1000000000;
+                    c.head[i]+=MAX_CELL;
                 }
             }
         }
@@ -292,7 +269,7 @@ const BigInt BigInt::operator+(const BigInt &b) const
                 if (l.head[i]<0)
                 {
                     l.head[i+1]--;
-                    l.head[i]+=1000000000;
+                    l.head[i]+=MAX_CELL;
                 }
             }
             c=l;
@@ -302,17 +279,38 @@ const BigInt BigInt::operator+(const BigInt &b) const
     return c;
 }
 
-const BigInt BigInt::operator-(const BigInt &b) const
+BigInt BigInt::operator-(const BigInt &b) const
 {
     return *this+(-b);
 }
 
-const BigInt BigInt::operator+(const int b) const
+BigInt BigInt::operator+(const int b) const
 {
     return *this+BigInt(b);
 }
 
-const BigInt BigInt::operator-(const int b) const
+BigInt BigInt::operator-(const int b) const
 {
     return *this-BigInt(b);
+}
+
+bool BigInt::ChangeMem(int size,bool isfree)
+{
+    this->size=size;
+    if (isfree)
+    {
+        if (this->head)
+            free(this->head);
+        this->head=(int*)malloc(this->size*sizeof(int));
+    }
+    else
+    {
+        this->head=(int*)realloc(this->head,this->size*sizeof(int));
+    }
+    if (!this->head)
+    {
+        throw std::bad_alloc();
+        return false;
+    }
+    return true;
 }
