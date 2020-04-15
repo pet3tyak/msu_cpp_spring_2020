@@ -7,6 +7,7 @@
 #include <cstddef>
 
 class BigInt{
+    static const int MAX_CELL=1000000000;
     int* head;
     bool sign;
     int size;

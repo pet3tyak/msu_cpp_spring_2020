@@ -1,5 +1,5 @@
 #include "BInt.h"
-#define MAX_CELL 1000000000
+
 BigInt::BigInt()
 {
     size=1;
@@ -13,12 +13,12 @@ BigInt::BigInt(int val)
     this->sign=(val>=0);
     if (!this->sign)
         val*=-1;
-    if (int x=val/MAX_CELL)
+    if (int x=val/this->MAX_CELL)
     {
         this->size++;
         this->head=(int*)malloc(2*sizeof(int));
         this->head[1]=x;
-        this->head[0]=val%MAX_CELL;
+        this->head[0]=val%this->MAX_CELL;
     }
     else
     {
@@ -46,7 +46,7 @@ BigInt::BigInt(const BigInt& val)
 BigInt::~BigInt()
 {
     if (this->head)
-        free(this->head);
+        delete [] this->head;
 }
 
 BigInt& BigInt::operator=(int val)
@@ -55,12 +55,12 @@ BigInt& BigInt::operator=(int val)
     this->sign=(val>=0);
     if (!this->sign)
         val*=-1;
-    if (int x=val/MAX_CELL)
+    if (int x=val/this->MAX_CELL)
     {
         this->size++;
         this->ChangeMem(this->size,true);
         this->head[1]=x;
-        this->head[0]=val%MAX_CELL;
+        this->head[0]=val%this->MAX_CELL;
     }
     else
     {
@@ -111,7 +111,7 @@ std::ostream& operator<<(std::ostream &cc, const BigInt& val)
     i++;
     for (;i<val.size;i++)
     {
-        int m=MAX_CELL/10;
+        int m=val.MAX_CELL/10;
         for (j=0;j<9;j++)
         {
             cc<<k[val.size-i-1]/m%10;
@@ -233,7 +233,7 @@ BigInt BigInt::operator+(const BigInt &b) const
         for (int i=0;i<c.size;i++)
         {
             c.head[i]+=b.head[i];
-            if (c.head[i]/MAX_CELL)
+            if (c.head[i]/this->MAX_CELL)
             {
                 if (i==c.size-1)
                 {
@@ -241,8 +241,8 @@ BigInt BigInt::operator+(const BigInt &b) const
                     c.ChangeMem(c.size,false);
                     c.head[c.size-1]=0;
                 }
-                c.head[i+1]+=c.head[i]%MAX_CELL;
-                c.head[i]=c.head[i]/MAX_CELL;
+                c.head[i+1]+=c.head[i]%this->MAX_CELL;
+                c.head[i]=c.head[i]/this->MAX_CELL;
             }
         }
     }
@@ -256,7 +256,7 @@ BigInt BigInt::operator+(const BigInt &b) const
                 if (c.head[i]<0)
                 {
                     c.head[i+1]--;
-                    c.head[i]+=MAX_CELL;
+                    c.head[i]+=this->MAX_CELL;
                 }
             }
         }
@@ -269,7 +269,7 @@ BigInt BigInt::operator+(const BigInt &b) const
                 if (l.head[i]<0)
                 {
                     l.head[i+1]--;
-                    l.head[i]+=MAX_CELL;
+                    l.head[i]+=this->MAX_CELL;
                 }
             }
             c=l;
@@ -296,21 +296,30 @@ BigInt BigInt::operator-(const int b) const
 
 bool BigInt::ChangeMem(int size,bool isfree)
 {
+    int* cpy;
+    int tmpsize;
+    if (!isfree)
+    {
+        tmpsize=this->size;
+        cpy=new int[tmpsize];
+        for (int i=0;i<tmpsize;i++)
+        {
+            cpy[i]=this->head[i];
+        }
+    }
     this->size=size;
-    if (isfree)
-    {
-        if (this->head)
-            free(this->head);
-        this->head=(int*)malloc(this->size*sizeof(int));
-    }
-    else
-    {
-        this->head=(int*)realloc(this->head,this->size*sizeof(int));
-    }
+    this->head=new int[this->size];
     if (!this->head)
     {
         throw std::bad_alloc();
         return false;
+    }
+    if (!isfree)
+    {
+        for (int i=0;i<tmpsize;i++)
+        {
+            this->head[i]=cpy[i];
+        }
     }
     return true;
 }
