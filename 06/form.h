@@ -23,7 +23,7 @@ std::string format(const std::string& str, ArgsT&&... args)
     int args_size = args_new.size();
     bool open = false;
     bool check_closed = false;
-
+    
     for (int i = 0; i < size; i++)
     {
         if (check_closed)
@@ -39,11 +39,11 @@ std::string format(const std::string& str, ArgsT&&... args)
             {
                 if (!std::isdigit(str[i]))
                 {
-                throw std::runtime_error("Bracket not closed");
+                    throw std::runtime_error("Bracket not closed");
                 }
             }
         }
-
+        
         if (open)
         {
             if (std::isdigit(str[i]))
@@ -81,9 +81,9 @@ std::string format(const std::string& str, ArgsT&&... args)
                 out << str[i];
             }
         }
-
+        
     }
-
+    
     if (open||check_closed)
     {
         throw std::runtime_error("Single bracket in the end of string");

@@ -4,20 +4,20 @@
 #include "form.h"
 
 #define checkEqual(x, y) \
-    do { \
-        if ((x) != (y)) \
-        { \
-            std::cout << "at line " << __LINE__ << ": " << (x) << " != " << (y) << '\n'; \
-        }; \
-    } while(0)
+do { \
+if ((x) != (y)) \
+{ \
+std::cout << "at line " << __LINE__ << ": " << (x) << " != " << (y) << '\n'; \
+}; \
+} while(0)
 
 #define checkThrow(x) \
-    do { \
-        try { (x); } \
-        catch (const std::runtime_error&) { break; } \
-        catch (...) {} \
-        std::cout << "expected runtime_error at line " << __LINE__ << '\n'; \
-    } while(0)
+do { \
+try { (x); } \
+catch (const std::runtime_error&) { break; } \
+catch (...) {} \
+std::cout << "expected runtime_error at line " << __LINE__ << '\n'; \
+} while(0)
 
 struct Test
 {
@@ -27,10 +27,10 @@ std::ostream& operator<<(std::ostream& out, const Test&)
 {
     out << "test";
     return out;
-}
-
-int main()
-{
+    }
+    
+    int main()
+    {
     checkEqual(format(""), "");
     checkEqual(format("1"), "1");
     checkEqual(format("{1}", 1, 2), "2");
@@ -41,7 +41,7 @@ int main()
     checkEqual(format("{0}", const_cast<Test&>(test)), "test");
     checkEqual(format("{1} aaa {0}{2} {1}", 1, test, "kek"), "test aaa 1kek test");
     checkEqual(format("{0}{11}", "a",1,2,3,4,5,6,7,8,9,10,12), "a12");
-
+    
     checkThrow(format("{", 1));
     checkThrow(format("{0", 1));
     checkThrow(format("}", 1));
@@ -53,8 +53,8 @@ int main()
     checkThrow(format("{{0}", 1));
     checkThrow(format("{10}", 1));
     checkThrow(format("{10", 1,2,3,4,5,6,7,8,9,10,12));
-
+    
     std::cout << "done\n";
-
+    
     return 0;
-}
+    }
